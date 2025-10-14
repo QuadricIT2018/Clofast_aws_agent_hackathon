@@ -11,12 +11,13 @@ import { store } from "./store/store";
 import { setUser } from "./store/slices/usersSlice";
 import ToastProvider from "./components/ToastProvider";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import SigninPage from "./pages/Signin";
 import SignupPage from "./pages/Signup";
 import Profiles from "./pages/Profiles";
 import ScrollToTop from "./components/ScrollToTop";
+import ProfileDetailsPage from "./pages/ProfileDetailsPage";
 
 function AppContent() {
   const location = useLocation();
@@ -28,11 +29,12 @@ function AppContent() {
       {!hideNavbar && <Navbar />}
       <div className={!hideNavbar ? "pt-28" : ""}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profiles" element={<Profiles />} />
+          <Route path="/profiles/:id" element={<ProfileDetailsPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

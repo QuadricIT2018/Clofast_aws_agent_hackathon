@@ -5,9 +5,6 @@ import MatchingRule from "../models/MatchingRule";
 import Profile from "../models/profiles";
 import { uploadToS3 } from "../utils/s3Uploader";
 
-/**
- * Controller: Create Profile with all dependencies (Documents, ExtractionRules, MatchingRules)
- */
 export const createProfile = async (req: Request, res: Response) => {
   try {
     const {
@@ -20,11 +17,9 @@ export const createProfile = async (req: Request, res: Response) => {
 
     const files = req.files as Express.Multer.File[];
 
-    // 1️⃣ Upload each file to S3 and combine with the document data from frontend
     const documentPromises = files.map(async (file, index) => {
       const s3Url = await uploadToS3(file);
 
-      // Merge uploaded S3 URL with corresponding frontend document data
       const frontendDoc = documents[index];
       const documentData = {
         documentName: frontendDoc.documentName || file.originalname,
@@ -43,26 +38,24 @@ export const createProfile = async (req: Request, res: Response) => {
     });
 
     const documentIds = await Promise.all(documentPromises);
-    // 🧩 2️⃣ Create Extraction Rules (ignore any _id from frontend)
+
     const extractionRulePromises = extractionRules.map(async (rule: any) => {
       const newRule = await ExtractionRule.create({
         extractionRuleName: rule.extractionRuleName,
         extractionRuleDescription: rule.extractionRuleDescription,
         terms: rule.terms,
-        documentIds, // associate with all uploaded docs
+        documentIds,
       });
       return newRule._id;
     });
 
     const extractionRuleIds = await Promise.all(extractionRulePromises);
 
-    // 🔗 3️⃣ Update Documents to reference created extraction rules
     await Document.updateMany(
       { _id: { $in: documentIds } },
       { $set: { extractionRule: extractionRuleIds } }
     );
 
-    // ⚖️ 4️⃣ Create Matching Rules (ignore any _id from frontend)
     const matchingRulePromises = matchingRules.map(async (rule: any) => {
       const newRule = await MatchingRule.create({
         matchingRuleName: rule.matchingRuleName,
@@ -75,12 +68,12 @@ export const createProfile = async (req: Request, res: Response) => {
 
     const matchingRuleIds = await Promise.all(matchingRulePromises);
 
-    // 🧠 5️⃣ Finally, create Profile
     const profile = await Profile.create({
       profileName,
       profileDescription,
       documents: documentIds,
       matchingRules: matchingRuleIds,
+      extractionRules: extractionRuleIds,
     });
 
     res.status(201).json({
@@ -93,5 +86,36 @@ export const createProfile = async (req: Request, res: Response) => {
       message: "Failed to create profile",
       error: error.message || error,
     });
+  }
+};
+
+export const getProfiles = async (req: Request, res: Response) => {
+  try {
+    const profiles = await Profile.find()
+      .populate("matchingRules")
+      .populate("documents")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(profiles);
+  } catch (error) {
+    console.error("Error fetching profiles:", error);
+    res.status(500).json({ message: "Failed to fetch profiles" });
+  }
+};
+
+export const getProfileById = async (req: Request, res: Response) => {
+  try {
+    const profile = await Profile.findById(req.params.id)
+      .populate("matchingRules")
+      .populate("documents");
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ message: "Failed to fetch profile" });
   }
 };

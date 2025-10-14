@@ -1,12 +1,13 @@
 import { type Profile } from "../types/profileTypes";
+import { useNavigate } from "react-router-dom";
 import {
-  Play,
   Edit2,
   Trash2,
   FileText,
   CheckCircle,
   AlertCircle,
   XCircle,
+  Eye,
 } from "lucide-react";
 
 const ProfileCard: React.FC<{
@@ -15,9 +16,13 @@ const ProfileCard: React.FC<{
   onRun: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
-}> = ({ profile, viewMode, onRun, onEdit, onDelete }) => {
+}> = ({ profile, viewMode, onEdit, onDelete }) => {
   const isListView = viewMode === "list";
+  const navigate = useNavigate();
 
+  const handleView = () => {
+    navigate(`/profiles/${profile._id}`);
+  };
   return (
     <div
       className={`bg-bg-light border border-border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${
@@ -118,12 +123,12 @@ const ProfileCard: React.FC<{
 
         {/* Right - Run Button */}
         <button
-          onClick={() => onRun(profile._id)}
+          onClick={handleView}
           className="flex items-center gap-2 px-4 py-2 bg-bg-button hover:bg-bg-button/80 text-text-inverted font-medium rounded-lg transition-all duration-200 shadow-sm"
-          title="Run Profile"
+          title="View Profile"
         >
-          <Play className="w-4 h-4" fill="currentColor" />
-          Run
+          <Eye className="w-4 h-4" />
+          View
         </button>
       </div>
     </div>

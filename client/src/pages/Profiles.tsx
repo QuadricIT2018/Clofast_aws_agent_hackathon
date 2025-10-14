@@ -1,78 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { fetchProfiles } from "../api/profileAPI";
 import { Search, Grid, List, Plus } from "lucide-react";
 import ProfileCard from "../components/ProfileCard";
 import { type Profile } from "../types/profileTypes";
-import { useState } from "react";
 import CreateProfileOverlay from "../components/CreateProfileOverlay/CreateProfileOverlay";
 import { ProfileCreationProvider } from "../context/ProfileCreationProvider";
 const Profiles: React.FC = () => {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  // Sample profile data - replace with API call
-  const [profiles] = useState<Profile[]>([
-    {
-      _id: "1",
-      profileName: "Q1 2024 Sales Reconciliation",
-      profileDescription:
-        "Reconciliation of sales data for Q1 2024 including all POS transactions and invoices",
-      numberOfDocuments: 245,
-      numberOfUnReconciledDocuments: 28,
-      numberOfReconciledDocuments: 205,
-      numberOfDiscrepancyDocuments: 12,
-    },
-    {
-      _id: "2",
-      profileName: "Monthly Payment Processing",
-      profileDescription:
-        "Monthly reconciliation of payment records with bank statements",
-      numberOfDocuments: 156,
-      numberOfUnReconciledDocuments: 15,
-      numberOfReconciledDocuments: 138,
-      numberOfDiscrepancyDocuments: 3,
-    },
-    {
-      _id: "3",
-      profileName: "Vendor Invoice Matching",
-      profileDescription:
-        "Automated matching of vendor invoices with purchase orders",
-      numberOfDocuments: 89,
-      numberOfUnReconciledDocuments: 12,
-      numberOfReconciledDocuments: 74,
-      numberOfDiscrepancyDocuments: 3,
-    },
-    {
-      _id: "4",
-      profileName: "Annual Tax Documents",
-      profileDescription:
-        "Year-end tax document reconciliation and verification process",
-      numberOfDocuments: 412,
-      numberOfUnReconciledDocuments: 45,
-      numberOfReconciledDocuments: 350,
-      numberOfDiscrepancyDocuments: 17,
-    },
-    {
-      _id: "5",
-      profileName: "Expense Report Validation",
-      profileDescription:
-        "Employee expense report validation against receipts and policies",
-      numberOfDocuments: 178,
-      numberOfUnReconciledDocuments: 22,
-      numberOfReconciledDocuments: 149,
-      numberOfDiscrepancyDocuments: 7,
-    },
-    {
-      _id: "6",
-      profileName: "Inventory Reconciliation",
-      profileDescription:
-        "Monthly inventory count reconciliation with system records",
-      numberOfDocuments: 203,
-      numberOfUnReconciledDocuments: 31,
-      numberOfReconciledDocuments: 165,
-      numberOfDiscrepancyDocuments: 7,
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const loadProfiles = async () => {
+      try {
+        const data = await fetchProfiles();
+        setProfiles(data);
+      } catch (error) {
+        console.error("Error fetching profiles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfiles();
+  }, []);
   // Filter profiles based on search query
   const filteredProfiles = profiles.filter(
     (profile) =>
@@ -186,7 +138,13 @@ const Profiles: React.FC = () => {
         </div>
 
         {/* Profiles Grid/List */}
-        {filteredProfiles.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <p className="text-text-secondary text-lg animate-pulse">
+              Loading profiles...
+            </p>
+          </div>
+        ) : filteredProfiles.length > 0 ? (
           <div
             className={
               viewMode === "grid"
