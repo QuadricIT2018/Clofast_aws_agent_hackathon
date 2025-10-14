@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* stylelint-disable-next-line at-rule-no-unknown */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* stylelint-disable-next-line at-rule-no-unknown */
+@theme {
+  /* Light mode */
+  --color-bg-navbar: #000000;
+  --color-bg-light: #ffffff;
+  --color-bg: #f7f7f7;
+  --color-bg-dark: #e5e5e5;
+  --color-text-primary: #000000;
+  --color-text-secondary: #434343;
+  --color-text-tertiary: #707070;
+  --color-text-inverted: #ffffff;
+  --color-border: #ececec;
+  --color-border-dark: #bfbfbf;
+  --color-url: #1a7bff;
+  --color-bg-button: #000000;
+  --color-primary: #1a7bff;
+  --color-bg-special-blue: #3071f2;
+  --color-bg-special-green: #b7fc9a;
+
+  /* Dark mode */
+  /* --color-d-bg-navbar: #ffffff;
+  --color-d-bg-light: #1e1e1e;
+  --color-d-bg: #121212;
+  --color-d-bg-dark: #1a1a1a;
+  --color-d-text-primary: #f5f5f5;
+  --color-d-text-secondary: #c2c2c2;
+  --color-d-text-tertiary: #9b9b9b;
+  --color-d-text-inverted: #0d0d0d;
+  --color-d-border: #2c2c2c;
+  --color-d-url: #4da6ff;
+  --color-d-bg-button: #f5f5f5;
+  --color-d-primary: #4a90ff;
+  --color-d-bg-special-blue: #5c8dff;
+  --color-d-bg-special-green: #5adf72; */
+
+  /* Status colors (same across themes) */
+  --color-progress-green: #57e4a1;
+  --color-danger: #ff5b5b;
+  --color-warning: #efbf45;
+  --color-success: #33ae74;
+  --color-info: #7ab2ff;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  transition: background-color 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-bg);
+  }
+}
+
+.dark body,
+html.dark body {
+  background-color: var(--color-d-bg);
+}
+
+.light body,
+html.light body {
+  background-color: var(--color-bg-navbar);
+}
