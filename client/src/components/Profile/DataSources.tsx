@@ -103,18 +103,17 @@ const DataSources = ({
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
- const toggleDataSourceSelection = (docId: string) => {
-   setSelectedDataSources((prev) => {
-     const newSet = new Set(prev);
-     if (newSet.has(docId)) newSet.delete(docId);
-     else if (newSet.size < 2) newSet.add(docId);
+  const toggleDataSourceSelection = (docId: string) => {
+    setSelectedDataSources((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(docId)) newSet.delete(docId);
+      else if (newSet.size < 2) newSet.add(docId);
 
-     const selectedDocs = documents.filter((doc) => newSet.has(doc._id));
-     setSelectedDocuments(selectedDocs);
-     return newSet;
-   });
- };
-
+      const selectedDocs = documents.filter((doc) => newSet.has(doc._id));
+      setSelectedDocuments(selectedDocs);
+      return newSet;
+    });
+  };
 
   const handleExtract = async (doc: DocumentData) => {
     try {
@@ -136,7 +135,6 @@ const DataSources = ({
       setSelectedDataSources(syncedSet);
     }
   }, [documents, selectedDocuments]);
-
 
   return (
     <div className="w-full">

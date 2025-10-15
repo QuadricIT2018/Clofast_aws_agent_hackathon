@@ -13,7 +13,7 @@ import {
 import { type Profile } from "../../types/profileTypes";
 import { type MatchingRule } from "../../types/profileTypes";
 import { fetchMatchingRules } from "../../api/matchingAPI";
-// Types
+import { useReconciliation } from "../../hooks/useReconciliation";
 interface MatchingTermPair {
   term1: string;
   term2: string;
@@ -27,6 +27,8 @@ const MatchingRules = ({
   profile,
 }: // onProceedToReconciliation,
 MatchingRulesProps) => {
+  const { selectedMatchingRules, setSelectedMatchingRules } =
+    useReconciliation();
   const [matchingRules, setMatchingRules] = useState<MatchingRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,17 +65,21 @@ MatchingRulesProps) => {
       } else {
         newSet.add(ruleId);
       }
+      const selectedRuleSets = matchingRules.filter((rule) =>
+        newSet.has(rule._id)
+      );
+      setSelectedMatchingRules(selectedRuleSets);
       return newSet;
     });
   };
 
-  const handleProceedToReconciliation = () => {
-    if (selectedRules.size > 0) {
-      // Store selected rules for reconciliation
-      console.log("Selected rules:", Array.from(selectedRules));
-      // onProceedToReconciliation?.();
-    }
-  };
+  // const handleProceedToReconciliation = () => {
+  //   if (selectedRules.size > 0) {
+  //     // Store selected rules for reconciliation
+  //     console.log("Selected rules:", Array.from(selectedRules));
+  //     // onProceedToReconciliation?.();
+  //   }
+  // };
 
   const getRuleStatus = (rule: MatchingRule) => {
     // Consider a rule "active" if it has document pairs and matching criteria
@@ -87,6 +93,14 @@ MatchingRulesProps) => {
     }
     return `${rules.length} matching criteria`;
   };
+
+  useEffect(() => {
+    // When matchingRules are loaded or context changes, sync the local state
+    if (matchingRules.length > 0 && selectedMatchingRules.length > 0) {
+      const syncedSet = new Set(selectedMatchingRules.map((rule) => rule._id));
+      setSelectedRules(syncedSet);
+    }
+  }, [matchingRules, selectedMatchingRules]);
 
   // Loading State
   if (loading) {
@@ -273,7 +287,7 @@ MatchingRulesProps) => {
       </div>
 
       {/* Footer with Selection Summary and Proceed Button */}
-      <div className="bg-bg-light border border-border rounded-xl p-6">
+      {/* <div className="bg-bg-light border border-border rounded-xl p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -311,7 +325,7 @@ MatchingRulesProps) => {
             <ArrowRight className="w-5 h-5" />
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

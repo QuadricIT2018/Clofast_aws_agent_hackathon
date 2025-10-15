@@ -3,7 +3,12 @@ import Document from "../models/Document";
 import ExtractionRule from "../models/ExtractionRule";
 // import { callGeminiAPI } from "../services/geminiService";
 import * as XLSX from "xlsx";
-import path from "path";
+import axios from "axios";
+export interface ApiError {
+  message: string;
+  status?: number;
+  details?: unknown;
+}
 
 export const extractDocument = async (req: Request, res: Response) => {
   try {
@@ -13,10 +18,15 @@ export const extractDocument = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Document ID is required" });
     }
 
-    // 1️⃣ Fetch document from MongoDB
     const document = await Document.findById(documentId);
     if (!document) {
-      return res.status(404).json({ message: "Document not found" });
+      const error: ApiError = { message: "Document not found", status: 404 };
+      return res.status(error.status ?? 500).json(error);
+    }
+
+    if (!document.documentUrl) {
+      const error: ApiError = { message: "Document URL missing", status: 400 };
+      return res.status(error.status ?? 500).json(error);
     }
 
     // Gemini API calling --------------------------
@@ -35,33 +45,30 @@ export const extractDocument = async (req: Request, res: Response) => {
     // document.dataSource = extractedData as Record<string, unknown>; await document.save();
 
     // 2️⃣ Fetch associated extraction rules
+    // 2️⃣ Fetch associated extraction rules
     let extractionTerms: string[] = [];
-
     if (document.extractionRule && document.extractionRule.length > 0) {
       const rules = await ExtractionRule.find({
         _id: { $in: document.extractionRule },
       });
 
-      // Merge all unique terms from the rules
       extractionTerms = [...new Set(rules.flatMap((rule) => rule.terms || []))];
-    } else {
-      console.warn("No extraction rules linked to this document.");
     }
 
     if (extractionTerms.length === 0) {
-      return res.status(400).json({
-        success: false,
+      const error: ApiError = {
         message: "No extraction terms found for this document.",
-      });
+        status: 400,
+      };
+      return res.status(error.status ?? 500).json(error);
     }
 
-    // 3️⃣ Load dummy Excel file (instead of Gemini API)
-    const dummyFilePath = path.join(
-      __dirname,
-      "../assets/Bankstatement_pos.xlsx"
-    );
+    // 3️⃣ Download Excel file from documentUrl (remote or local)
+    const response = await axios.get(document.documentUrl, {
+      responseType: "arraybuffer",
+    });
 
-    const workbook = XLSX.readFile(dummyFilePath);
+    const workbook = XLSX.read(response.data, { type: "buffer" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
@@ -85,17 +92,18 @@ export const extractDocument = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message:
-        "Data extracted successfully using extraction rules (Gemini skipped)",
+      message: "Data extracted successfully from document URL",
       extractionTerms,
       data: extractedData,
     });
-  } catch (error: any) {
-    console.error("Error extracting document:", error);
-    res.status(500).json({
+  } catch (error: unknown) {
+    const err = error as ApiError;
+    console.error("Error extracting document:", err.message);
+
+    return res.status(err.status || 500).json({
       success: false,
       message: "Server error during extraction",
-      error: error.message,
+      error: err.message || error,
     });
   }
 };

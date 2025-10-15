@@ -54,3 +54,20 @@ export interface ProfileCreationData {
   extractionRules: ExtractionRule[];
   matchingRules: MatchingRule[];
 }
+
+export interface Transaction {
+  id: string;
+  date?: string;
+  description?: string;
+  amount?: number;
+  referenceId?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export interface ReconciliationResult {
+  leftTransaction: Transaction;
+  rightTransaction: Transaction | null;
+  isReconciled: boolean;
+  matchedFields?: string[];
+}

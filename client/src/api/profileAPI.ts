@@ -20,3 +20,23 @@ export const deleteProfileCascade = async (profileId: string) => {
   );
   return response.data;
 };
+
+import { type ReconciliationResult } from "../types/profileTypes";
+
+// Perform reconciliation using backend API
+export const reconcileDocuments = async (
+  documentIds: string[],
+  matchingRuleIds: string[]
+): Promise<ReconciliationResult[]> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/profiles/reconcile`, {
+      documentIds,
+      matchingRuleIds,
+    });
+
+    return response.data.data as ReconciliationResult[];
+  } catch (error) {
+    console.error("Error performing reconciliation:", error);
+    throw error;
+  }
+};

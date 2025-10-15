@@ -6,6 +6,7 @@ import Dashboard from "../components/Profile/Dashboard";
 import DataSources from "../components/Profile/DataSources";
 import MatchingRules from "../components/Profile/MatchingRules";
 import ReconcileScreen from "../components/Profile/ReconcileScreen";
+import { useReconciliation } from "../hooks/useReconciliation";
 
 type TabType =
   | "dashboard"
@@ -19,6 +20,9 @@ const ProfileDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+  const { selectedDocuments, selectedMatchingRules } = useReconciliation();
+  const canRunReconciliation =
+    selectedDocuments.length > 0 && selectedMatchingRules.length > 0;
 
   useEffect(() => {
     const getProfile = async () => {
@@ -41,8 +45,8 @@ const ProfileDetailsPage = () => {
   }, [id]);
 
   const handleRunReconciliation = () => {
-    // TODO: Implement reconciliation trigger logic
     console.log("Run reconciliation for profile:", profile?._id);
+    setActiveTab("reconcileScreen");
   };
 
   if (loading) {
@@ -112,13 +116,24 @@ const ProfileDetailsPage = () => {
             </div>
 
             {/* Right Side - Run Button */}
-            <div className="ml-6">
+            <div className="ml-6 relative group">
               <button
                 onClick={handleRunReconciliation}
-                className="px-6 py-2.5 bg-bg-button  text-text-inverted  rounded-lg font-medium hover:opacity-90 transition-opacity"
+                disabled={!canRunReconciliation}
+                className={`px-6 py-2.5 rounded-lg font-medium transition-opacity ${
+                  canRunReconciliation
+                    ? "bg-bg-button text-text-inverted hover:opacity-90"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                }`}
               >
                 Run
               </button>
+
+              {!canRunReconciliation && (
+                <div className="absolute -top-10 right-0 bg-gray-800 text-white text-sm px-3 py-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Please select the data sources and matching rules
+                </div>
+              )}
             </div>
           </div>
         </div>

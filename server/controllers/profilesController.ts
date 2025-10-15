@@ -5,6 +5,19 @@ import MatchingRule from "../models/MatchingRule";
 import Profile from "../models/profiles";
 import { uploadToS3 } from "../utils/s3Uploader";
 
+interface Transaction {
+  [key: string]: any;
+  id?: string;
+  Amount?: number;
+}
+
+interface ReconciliationResult {
+  leftTransaction: Transaction;
+  rightTransaction: Transaction | null;
+  isReconciled: boolean;
+  matchedFields?: string[];
+}
+
 export const createProfile = async (req: Request, res: Response) => {
   try {
     const {
@@ -158,6 +171,136 @@ export const deleteProfileCascade = async (req: Request, res: Response) => {
     res.status(500).json({
       message: "Failed to delete profile and related data.",
       error: (error as Error).message,
+    });
+  }
+};
+
+export const reconcileDocuments = async (req: Request, res: Response) => {
+  try {
+    const { documentIds, matchingRuleIds } = req.body;
+
+    if (!documentIds || documentIds.length !== 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Exactly two document IDs are required",
+      });
+    }
+
+    // 1️⃣ Fetch documents and matching rules
+    const [leftDoc, rightDoc] = await Promise.all([
+      Document.findById(documentIds[0]),
+      Document.findById(documentIds[1]),
+    ]);
+
+    if (!leftDoc || !rightDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "One or both documents not found",
+      });
+    }
+
+    const matchingRules = matchingRuleIds.length
+      ? await MatchingRule.find({ _id: { $in: matchingRuleIds } })
+      : [];
+
+    const leftData = Array.isArray(leftDoc.dataSource)
+      ? leftDoc.dataSource
+      : [];
+    const rightData = Array.isArray(rightDoc.dataSource)
+      ? rightDoc.dataSource
+      : [];
+
+    // 2️⃣ Perform reconciliation logic (same as frontend)
+    const results: ReconciliationResult[] = [];
+    const matchedRightIndices = new Set<number>();
+
+    for (const leftTx of leftData) {
+      let matched = false;
+      let matchedRightTx: Transaction | null = null;
+      let matchedFields: string[] = [];
+
+      for (let i = 0; i < rightData.length; i++) {
+        if (matchedRightIndices.has(i)) continue;
+
+        const rightTx = rightData[i];
+        let allRulesMatch = true;
+        const currentMatchedFields: string[] = [];
+
+        if (matchingRules.length > 0) {
+          for (const rule of matchingRules) {
+            for (const pair of rule.rules) {
+              const leftValue = leftTx[pair.term1];
+              const rightValue = rightTx[pair.term2];
+
+              const normalizedLeft = String(leftValue).trim().toLowerCase();
+              const normalizedRight = String(rightValue).trim().toLowerCase();
+
+              if (
+                normalizedLeft === normalizedRight &&
+                leftValue !== undefined &&
+                rightValue !== undefined
+              ) {
+                currentMatchedFields.push(`${pair.term1}↔${pair.term2}`);
+              } else {
+                allRulesMatch = false;
+                break;
+              }
+            }
+            if (!allRulesMatch) break;
+          }
+        } else {
+          // Default rule: match by Amount
+          if (leftTx.Amount !== undefined && rightTx.Amount !== undefined) {
+            const leftAmount = Number(leftTx.Amount);
+            const rightAmount = Number(rightTx.Amount);
+            if (Math.abs(leftAmount - rightAmount) < 0.01) {
+              currentMatchedFields.push("Amount");
+            } else {
+              allRulesMatch = false;
+            }
+          }
+        }
+
+        if (allRulesMatch && currentMatchedFields.length > 0) {
+          matched = true;
+          matchedRightTx = rightTx;
+          matchedFields = currentMatchedFields;
+          matchedRightIndices.add(i);
+          break;
+        }
+      }
+
+      results.push({
+        leftTransaction: leftTx,
+        rightTransaction: matchedRightTx,
+        isReconciled: matched,
+        matchedFields,
+      });
+    }
+
+    // Add unmatched right transactions
+    rightData.forEach((rightTx, idx) => {
+      if (!matchedRightIndices.has(idx)) {
+        results.push({
+          leftTransaction: {} as Transaction,
+          rightTransaction: rightTx,
+          isReconciled: false,
+          matchedFields: [],
+        });
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Reconciliation completed successfully",
+      data: results,
+    });
+  } catch (error: any) {
+    console.error("Reconciliation error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during reconciliation",
+      error: error.message,
     });
   }
 };

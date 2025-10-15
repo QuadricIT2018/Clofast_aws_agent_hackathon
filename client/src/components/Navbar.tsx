@@ -33,7 +33,10 @@ const Navbar: React.FC = () => {
       <div className="bg-bg-navbar border border-border rounded-2xl shadow-lg px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate("dashboard")}
+          >
             <Logo width="120" height="120" navbar_theme="dark" />
           </div>
 

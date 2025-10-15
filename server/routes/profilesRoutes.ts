@@ -5,6 +5,7 @@ import {
   getProfileById,
   getProfiles,
   deleteProfileCascade,
+  reconcileDocuments,
 } from "../controllers/profilesController";
 
 const router = express.Router();
@@ -17,5 +18,7 @@ router.get("/", getProfiles);
 router.get("/:id", getProfileById);
 
 router.delete("/:id/cascade", deleteProfileCascade);
+
+router.post("/reconcile", reconcileDocuments);
 
 export default router;
