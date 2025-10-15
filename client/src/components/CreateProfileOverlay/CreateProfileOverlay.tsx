@@ -7,16 +7,25 @@ import ExtractionRulesStage from "./ExtractionRulesStage";
 import MatchingRulesStage from "./MatchingRulesStage";
 import { X } from "lucide-react";
 import { type DocumentData } from "../../types/profileTypes";
+import { showErrorToast, showSuccessToast } from "../../utils/toast";
+import { type MatchingRule } from "../../types/profileTypes";
 
 const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
   onClose,
 }) => {
   const [currentStage, setCurrentStage] = useState(1);
   const { data: profileData } = useProfileCreation();
-  const handleFinish = async () => {
+  const handleFinish = async (rules: MatchingRule[]) => {
     try {
       const formData = new FormData();
-      formData.append("data", JSON.stringify(profileData));
+
+      // Merge rules into profile data before sending
+      const finalProfileData = {
+        ...profileData,
+        matchingRules: rules,
+      };
+
+      formData.append("data", JSON.stringify(finalProfileData));
 
       // Append actual document files
       profileData.documents.forEach((doc: DocumentData) => {
@@ -31,12 +40,14 @@ const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
       });
 
       if (!res.ok) throw new Error("Failed to create profile");
+
       const result = await res.json();
       console.log("✅ Profile saved:", result);
+      showSuccessToast("Profile created successfully!");
       onClose();
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Error creating profile");
+      showErrorToast("Failed to create profile. Please try again.");
     }
   };
 

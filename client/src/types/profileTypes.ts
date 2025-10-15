@@ -8,11 +8,27 @@ export interface Profile {
   numberOfDiscrepancyDocuments: number;
 }
 
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue };
+
+export interface DocumentFile {
+  name: string;
+  size: number;
+  mimetype: string;
+  encoding?: string;
+}
 export interface DocumentData {
   _id: string;
   documentName: string;
   documentUrl: string;
-  file?: File;
+  file?: File | DocumentFile;
+  dataSource?: Record<string, JSONValue>;
+  extractionRules?: ExtractionRule[];
 }
 
 export interface ExtractionRule {
@@ -37,4 +53,21 @@ export interface ProfileCreationData {
   documents: DocumentData[];
   extractionRules: ExtractionRule[];
   matchingRules: MatchingRule[];
+}
+
+export interface Transaction {
+  id: string;
+  date?: string;
+  description?: string;
+  amount?: number;
+  referenceId?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export interface ReconciliationResult {
+  leftTransaction: Transaction;
+  rightTransaction: Transaction | null;
+  isReconciled: boolean;
+  matchedFields?: string[];
 }

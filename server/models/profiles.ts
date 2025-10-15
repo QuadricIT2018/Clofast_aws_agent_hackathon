@@ -8,6 +8,7 @@ export interface IProfile extends MongooseDocument {
   numberOfReconciledDocuments: number;
   numberOfDiscrepancyDocuments: number;
   matchingRules: mongoose.Types.ObjectId[];
+  extractionRules: mongoose.Types.ObjectId[];
   documents: mongoose.Types.ObjectId[];
 }
 
@@ -44,6 +45,12 @@ const ProfileSchema = new Schema<IProfile>(
       {
         type: Schema.Types.ObjectId,
         ref: "MatchingRule",
+      },
+    ],
+    extractionRules: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ExtractionRule",
       },
     ],
     documents: [

@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 import profileRoutes from "./routes/profilesRoutes";
 // Existing routers
 import userRouter from "./routes/usersRoutes";
+import documentRoutes from "./routes/documentsRoutes";
+import extractionRoutes from "./routes/extractionRulesRoutes";
+import matchingRules from "./routes/matchingRulesRoutes";
 
 dotenv.config();
 
@@ -24,11 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 // User Routes
 app.use("/api/users", userRouter);
 app.use("/api/profiles", profileRoutes);
-
-app.use((req, res, next) => {
-  console.log("❌ Unhandled route:", req.method, req.url);
-  next();
-});
+app.use("/api/documents", documentRoutes);
+app.use("/api/extraction", extractionRoutes);
+app.use("/api/matching-rules", matchingRules);
 
 // ----------------- MongoDB Connection -----------------
 mongoose
