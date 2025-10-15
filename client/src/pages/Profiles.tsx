@@ -46,10 +46,7 @@ const Profiles: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this profile?")) {
-      console.log("Deleting profile:", id);
-      alert(`Profile deleted: ${id}`);
-    }
+    setProfiles((profiles) => profiles.filter((profile) => profile._id !== id));
   };
 
   const handleCreateProfile = () => {

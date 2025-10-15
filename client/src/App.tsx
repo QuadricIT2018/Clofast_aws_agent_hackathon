@@ -18,6 +18,7 @@ import SignupPage from "./pages/Signup";
 import Profiles from "./pages/Profiles";
 import ScrollToTop from "./components/ScrollToTop";
 import ProfileDetailsPage from "./pages/ProfileDetailsPage";
+import ReconciliationProvider from "./context/ReconciliationProvider";
 
 function AppContent() {
   const location = useLocation();
@@ -34,7 +35,15 @@ function AppContent() {
           <Route path="/signin" element={<SigninPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profiles" element={<Profiles />} />
-          <Route path="/profiles/:id" element={<ProfileDetailsPage />} />
+          <Route
+            path="/profiles/:id"
+            element={
+              <ReconciliationProvider>
+                <ProfileDetailsPage />
+              </ReconciliationProvider>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

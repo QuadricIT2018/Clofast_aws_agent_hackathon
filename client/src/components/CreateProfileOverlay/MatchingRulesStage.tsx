@@ -3,7 +3,7 @@ import { useState } from "react";
 import { type MatchingRule } from "../../types/profileTypes";
 import { ChevronRight, Trash } from "lucide-react";
 const MatchingRulesStage: React.FC<{
-  onFinish: () => void;
+  onFinish: (rules: MatchingRule[]) => void;
   onBack: () => void;
 }> = ({ onFinish, onBack }) => {
   const { data, updateData } = useProfileCreation();
@@ -78,19 +78,7 @@ const MatchingRulesStage: React.FC<{
     }
 
     updateData({ matchingRules: rules });
-
-    // Simulate API call to create profile
-    const profileData = {
-      profileName: data.profileName,
-      profileDescription: data.profileDescription,
-      documents: data.documents.map((d) => d._id),
-      extractionRules: data.extractionRules.map((r) => r._id),
-      matchingRules: rules.map((r) => r._id),
-    };
-
-    console.log("Creating profile:", profileData);
-    alert("Profile created successfully!");
-    onFinish();
+    onFinish(rules);
   };
 
   return (

@@ -13,3 +13,10 @@ export const fetchProfileById = async (id: string): Promise<Profile> => {
   const response = await axios.get(`${API_BASE_URL}/profiles/${id}`);
   return response.data;
 };
+
+export const deleteProfileCascade = async (profileId: string) => {
+  const response = await axios.delete(
+    `${API_BASE_URL}/profiles/${profileId}/cascade`
+  );
+  return response.data;
+};

@@ -4,6 +4,7 @@ import {
   createProfile,
   getProfileById,
   getProfiles,
+  deleteProfileCascade,
 } from "../controllers/profilesController";
 
 const router = express.Router();
@@ -14,5 +15,7 @@ router.post("/", upload.array("documents"), createProfile);
 router.get("/", getProfiles);
 
 router.get("/:id", getProfileById);
+
+router.delete("/:id/cascade", deleteProfileCascade);
 
 export default router;

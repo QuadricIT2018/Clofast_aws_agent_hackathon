@@ -119,3 +119,45 @@ export const getProfileById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch profile" });
   }
 };
+
+export const deleteProfileCascade = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const profile = await Profile.findById(id);
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // --- Step 1: Delete all documents referenced in this profile ---
+    if (profile.documents && profile.documents.length > 0) {
+      await Document.deleteMany({ _id: { $in: profile.documents } });
+    }
+
+    // --- Step 2: Delete all extraction rules referenced in this profile ---
+    if (profile.extractionRules && profile.extractionRules.length > 0) {
+      await ExtractionRule.deleteMany({
+        _id: { $in: profile.extractionRules },
+      });
+    }
+
+    // --- Step 3: Delete all matching rules referenced in this profile ---
+    if (profile.matchingRules && profile.matchingRules.length > 0) {
+      await MatchingRule.deleteMany({ _id: { $in: profile.matchingRules } });
+    }
+
+    // --- Step 4: Finally delete the profile itself ---
+    await Profile.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message:
+        "Profile and all associated documents, extraction rules, and matching rules deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting profile cascade:", error);
+    res.status(500).json({
+      message: "Failed to delete profile and related data.",
+      error: (error as Error).message,
+    });
+  }
+};
