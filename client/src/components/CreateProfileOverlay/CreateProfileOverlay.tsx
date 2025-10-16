@@ -29,7 +29,7 @@ const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
 
       // Append actual document files
       profileData.documents.forEach((doc: DocumentData) => {
-        if (doc.file) {
+        if (doc.file instanceof File) {
           formData.append("documents", doc.file);
         }
       });
