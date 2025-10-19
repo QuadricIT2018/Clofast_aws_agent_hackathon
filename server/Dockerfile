@@ -27,4 +27,6 @@ RUN npm install --production
 EXPOSE 5550
 
 # Start backend
-CMD ["node", "dist/index.js"] # adjust if your entry point is different
+CMD ["node", "dist/index.js"] 
+
+# adjust if your entry point is different
