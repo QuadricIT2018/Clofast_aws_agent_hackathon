@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Document from "../models/Document";
-import ExtractionRule from "../models/ExtractionRule";
+import Document from "../models/Document.js";
+import ExtractionRule from "../models/ExtractionRule.js";
 // import { callGeminiAPI } from "../services/geminiService";
 import * as XLSX from "xlsx";
 import axios from "axios";

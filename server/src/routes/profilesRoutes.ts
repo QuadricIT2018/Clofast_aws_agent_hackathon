@@ -6,7 +6,7 @@ import {
   getProfiles,
   deleteProfileCascade,
   reconcileDocuments,
-} from "../controllers/profilesController";
+} from "../controllers/profilesController.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });

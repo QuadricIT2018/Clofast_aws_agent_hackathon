@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Document from "../models/Document";
-import Profile from "../models/profiles";
+import Document from "../models/Document.js";
+import Profile from "../models/profiles.js";
 
 export const getDocumentsByProfile = async (req: Request, res: Response) => {
   try {
