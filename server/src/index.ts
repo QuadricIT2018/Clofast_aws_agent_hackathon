@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+
 import profileRoutes from "./routes/profilesRoutes";
-// Existing routers
 import userRouter from "./routes/usersRoutes";
 import documentRoutes from "./routes/documentsRoutes";
 import extractionRoutes from "./routes/extractionRulesRoutes";
@@ -23,8 +23,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ----------------- Routes -----------------
-
-// User Routes
 app.use("/api/users", userRouter);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/documents", documentRoutes);
