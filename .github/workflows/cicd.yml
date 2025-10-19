@@ -58,6 +58,6 @@ jobs:
             -e GEMINI_API_URL="${{ secrets.GEMINI_API_URL }}" \
             gnaneswaryalla/clofast-server:latest
       - name: Run Client Container
-        run:
+        run: |
           docker run -d --restart unless-stopped -p 5173:80 --name clofast-client \
-          gnaneswaryalla/clofast-client:latest
+            gnaneswaryalla/clofast-client:latest
