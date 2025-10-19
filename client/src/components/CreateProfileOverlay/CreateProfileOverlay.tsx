@@ -6,9 +6,9 @@ import UploadDocumentsStage from "./UploadDocumentsStage";
 import ExtractionRulesStage from "./ExtractionRulesStage";
 import MatchingRulesStage from "./MatchingRulesStage";
 import { X } from "lucide-react";
-import { type DocumentData } from "../../types/profileTypes";
 import { showErrorToast, showSuccessToast } from "../../utils/toast";
 import { type MatchingRule } from "../../types/profileTypes";
+import { createProfile } from "../../api/profileAPI";
 
 const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
   onClose,
@@ -17,31 +17,7 @@ const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
   const { data: profileData } = useProfileCreation();
   const handleFinish = async (rules: MatchingRule[]) => {
     try {
-      const formData = new FormData();
-
-      // Merge rules into profile data before sending
-      const finalProfileData = {
-        ...profileData,
-        matchingRules: rules,
-      };
-
-      formData.append("data", JSON.stringify(finalProfileData));
-
-      // Append actual document files
-      profileData.documents.forEach((doc: DocumentData) => {
-        if (doc.file instanceof File) {
-          formData.append("documents", doc.file);
-        }
-      });
-
-      const res = await fetch("http://localhost:5550/api/profiles", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to create profile");
-
-      const result = await res.json();
+      const result = await createProfile(profileData, rules);
       console.log("✅ Profile saved:", result);
       showSuccessToast("Profile created successfully!");
       onClose();
