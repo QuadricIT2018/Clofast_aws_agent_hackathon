@@ -1,6 +1,11 @@
 import axios from "axios";
-import { type Profile } from "../types/profileTypes";
-
+import {
+  type DocumentData,
+  type MatchingRule,
+  type Profile,
+  type ProfileCreationData,
+} from "../types/profileTypes";
+import { type ReconciliationResult } from "../types/profileTypes";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5550";
 
@@ -21,7 +26,38 @@ export const deleteProfileCascade = async (profileId: string) => {
   return response.data;
 };
 
-import { type ReconciliationResult } from "../types/profileTypes";
+export const createProfile = async (
+  profileData: ProfileCreationData,
+  rules: MatchingRule[]
+) => {
+  try {
+    const formData = new FormData();
+
+    // Merge rules into profile data
+    const finalProfileData = {
+      ...profileData,
+      matchingRules: rules,
+    };
+
+    formData.append("data", JSON.stringify(finalProfileData));
+
+    // Append document files
+    profileData.documents.forEach((doc: DocumentData) => {
+      if (doc.file instanceof File) {
+        formData.append("documents", doc.file);
+      }
+    });
+
+    const response = await axios.post(`${API_BASE_URL}/profiles`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error creating profile:", error);
+    throw error;
+  }
+};
 
 // Perform reconciliation using backend API
 export const reconcileDocuments = async (
