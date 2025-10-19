@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "type": "module",
   "scripts": {
     "dev": "nodemon --exec ts-node index.ts --host 0.0.0.0",
     "build": "tsc",
-    "start": "node dist/index.ts",
+    "start": "node dist/index.js",
     "start:prod": "npm run build && npm start"
   },
   "author": "",
