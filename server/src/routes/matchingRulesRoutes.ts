@@ -1,5 +1,5 @@
 import express from "express";
-import { getMatchingRulesByProfile } from "../controllers/matchingRulesController";
+import { getMatchingRulesByProfile } from "../controllers/matchingRulesController.js";
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { extractDocument } from "../controllers/extractionRulesController";
+import { extractDocument } from "../controllers/extractionRulesController.js";
 
 const router = express.Router();
 

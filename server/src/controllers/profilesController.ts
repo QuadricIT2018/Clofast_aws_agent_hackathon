@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import Document from "../models/Document";
-import ExtractionRule from "../models/ExtractionRule";
-import MatchingRule from "../models/MatchingRule";
-import Profile from "../models/profiles";
-import { uploadToS3 } from "../utils/s3Uploader";
+import Document from "../models/Document.js";
+import ExtractionRule from "../models/ExtractionRule.js";
+import MatchingRule from "../models/MatchingRule.js";
+import Profile from "../models/profiles.js";
+import { uploadToS3 } from "../utils/s3Uploader.js";
 
 interface Transaction {
   [key: string]: any;

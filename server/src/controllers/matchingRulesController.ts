@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Profile from "../models/profiles";
+import Profile from "../models/profiles.js";
 
 export const getMatchingRulesByProfile = async (
   req: Request,

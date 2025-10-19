@@ -3,11 +3,11 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import profileRoutes from "./routes/profilesRoutes";
-import userRouter from "./routes/usersRoutes";
-import documentRoutes from "./routes/documentsRoutes";
-import extractionRoutes from "./routes/extractionRulesRoutes";
-import matchingRules from "./routes/matchingRulesRoutes";
+import profileRoutes from "./routes/profilesRoutes.js";
+import userRouter from "./routes/usersRoutes.js";
+import documentRoutes from "./routes/documentsRoutes.js";
+import extractionRoutes from "./routes/extractionRulesRoutes.js";
+import matchingRules from "./routes/matchingRulesRoutes.js";
 
 dotenv.config();
 

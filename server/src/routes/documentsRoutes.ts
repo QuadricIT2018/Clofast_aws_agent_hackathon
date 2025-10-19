@@ -1,5 +1,5 @@
 import express from "express";
-import { getDocumentsByProfile } from "../controllers/documentsController";
+import { getDocumentsByProfile } from "../controllers/documentsController.js";
 
 const router = express.Router();
 
