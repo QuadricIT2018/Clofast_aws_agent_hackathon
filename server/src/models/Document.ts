@@ -35,7 +35,7 @@ const DocumentSchema = new Schema<IDocument>(
       },
     ],
     dataSource: {
-      type: Object,
+      type: [Object],
       default: {},
     },
   },

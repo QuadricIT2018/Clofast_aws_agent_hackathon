@@ -7,6 +7,7 @@ const API_URL =
 
 export const extractDocumentData = async (documentId: string) => {
   try {
+    console.log(documentId);
     const response = await axios.post(`${API_URL}/extraction/extract`, {
       documentId,
     });

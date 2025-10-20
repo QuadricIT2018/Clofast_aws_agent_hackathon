@@ -28,10 +28,22 @@ const ExtractionRulesStage: React.FC<{
 
   const handleAddTerm = () => {
     if (termInput.trim()) {
+      // Split by commas, trim spaces, and remove duplicates or empty entries
+      const newTerms = termInput
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+
+      // Merge with existing terms, remove duplicates
+      const updatedTerms = Array.from(
+        new Set([...(currentRule.terms || []), ...newTerms])
+      );
+
       setCurrentRule({
         ...currentRule,
-        terms: [...(currentRule.terms || []), termInput.trim()],
+        terms: updatedTerms,
       });
+
       setTermInput("");
     }
   };
@@ -295,9 +307,6 @@ const ExtractionRulesStage: React.FC<{
       </div>
     );
 
-  // --------------------------------------------------------------------
-  // STAGE 2: DOCUMENT ASSIGNMENT
-  // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   // STAGE 2: DOCUMENT ASSIGNMENT
   // --------------------------------------------------------------------

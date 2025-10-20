@@ -43,7 +43,7 @@ export const createProfile = async (req: Request, res: Response) => {
           mimetype: file.mimetype,
           encoding: file.encoding,
         },
-        dataSource: frontendDoc.dataSource || {},
+        dataSource: [],
       };
 
       const newDoc = await Document.create(documentData);

@@ -1,8 +1,8 @@
 import express from "express";
-import { extractDocument } from "../controllers/extractionRulesController.js";
+import { extractDocumentData } from "../controllers/extractionRulesController.js";
 
 const router = express.Router();
 
-router.post("/extract", extractDocument);
+router.post("/extract", extractDocumentData);
 
 export default router;
