@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
         <div className="text-center mb-6 items-center justify-center flex flex-col gap-1">
           <Logo width="150" height="150" navbar_theme="light" />
           <p className="text-text-secondary text-sm">
-            AI-Powered POS Reconciliation
+            AI-Powered Reconciliation
           </p>
         </div>
 

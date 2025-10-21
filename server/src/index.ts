@@ -30,6 +30,7 @@ app.use("/api/extraction", extractionRoutes);
 app.use("/api/matching-rules", matchingRules);
 
 // ----------------- MongoDB Connection -----------------
+console.log(MONGODB_URI);
 mongoose
   .connect(MONGODB_URI)
   .then(() => {

@@ -80,6 +80,7 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
       const results = await reconcileDocuments(documentIds, matchingRuleIds);
 
       setReconciliationResults(results);
+      console.log(results);
     } catch (err) {
       console.error("Reconciliation failed:", err);
     } finally {
@@ -275,14 +276,14 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 {selectedDocuments[0]?.documentName || "Document 1"}
               </h3>
             </div>
-            <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full border-collapse">
+            <div className="overflow-x-auto overflow-y-auto max-h-[600px] w-full">
+              <table className="min-w-[800px] border-collapse">
                 <thead className="sticky top-0 bg-bg dark:bg-d-bg">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border">
                       Status
                     </th>
-                    {leftHeaders.slice(0, 4).map((header, idx) => (
+                    {leftHeaders.map((header, idx) => (
                       <th
                         key={idx}
                         className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -320,7 +321,7 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                             <XCircle className="w-4 h-4 text-danger" />
                           )}
                         </td>
-                        {leftHeaders.slice(0, 4).map((header, cellIdx) => (
+                        {leftHeaders.map((header, cellIdx) => (
                           <td
                             key={cellIdx}
                             className="px-4 py-3 text-sm text-text-secondary dark:text-d-text-secondary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -346,14 +347,14 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 {selectedDocuments[1]?.documentName || "Document 2"}
               </h3>
             </div>
-            <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-              <table className="w-full border-collapse">
+            <div className="overflow-x-auto overflow-y-auto max-h-[600px] w-full">
+              <table className="min-w-[800px] border-collapse">
                 <thead className="sticky top-0 bg-bg dark:bg-d-bg">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border">
                       Status
                     </th>
-                    {rightHeaders.slice(0, 4).map((header, idx) => (
+                    {rightHeaders.map((header, idx) => (
                       <th
                         key={idx}
                         className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -391,7 +392,7 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                             <XCircle className="w-4 h-4 text-danger" />
                           )}
                         </td>
-                        {rightHeaders.slice(0, 4).map((header, cellIdx) => (
+                        {rightHeaders.map((header, cellIdx) => (
                           <td
                             key={cellIdx}
                             className="px-4 py-3 text-sm text-text-secondary dark:text-d-text-secondary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -483,7 +484,6 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.entries(selectedUnreconciled.leftTransaction || {})
                     .filter(([key]) => key !== "id")
-                    .slice(0, 6)
                     .map(([key, value], idx) => (
                       <div
                         key={idx}
