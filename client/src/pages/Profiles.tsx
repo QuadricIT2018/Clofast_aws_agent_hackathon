@@ -11,18 +11,17 @@ const Profiles: React.FC = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const loadProfiles = async () => {
+    try {
+      const data = await fetchProfiles();
+      setProfiles(data);
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const loadProfiles = async () => {
-      try {
-        const data = await fetchProfiles();
-        setProfiles(data);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProfiles();
   }, []);
   // Filter profiles based on search query
@@ -176,7 +175,10 @@ const Profiles: React.FC = () => {
       </div>
       {showCreateModal && (
         <ProfileCreationProvider>
-          <CreateProfileOverlay onClose={() => setShowCreateModal(false)} />
+          <CreateProfileOverlay
+            onClose={() => setShowCreateModal(false)}
+            onProfileCreated={loadProfiles}
+          />
         </ProfileCreationProvider>
       )}
     </div>

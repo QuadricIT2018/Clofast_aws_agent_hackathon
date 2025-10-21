@@ -10,9 +10,10 @@ import { showErrorToast, showSuccessToast } from "../../utils/toast";
 import { type MatchingRule } from "../../types/profileTypes";
 import { createProfile } from "../../api/profileAPI";
 
-const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
-  onClose,
-}) => {
+const CreateProfileOverlay: React.FC<{
+  onClose: () => void;
+  onProfileCreated?: () => void;
+}> = ({ onClose, onProfileCreated }) => {
   const [currentStage, setCurrentStage] = useState(1);
   const { data: profileData } = useProfileCreation();
   const handleFinish = async (rules: MatchingRule[]) => {
@@ -20,6 +21,7 @@ const CreateProfileOverlay: React.FC<{ onClose: () => void }> = ({
       const result = await createProfile(profileData, rules);
       console.log("✅ Profile saved:", result);
       showSuccessToast("Profile created successfully!");
+      onProfileCreated?.();
       onClose();
     } catch (err) {
       console.error("❌ Error:", err);
