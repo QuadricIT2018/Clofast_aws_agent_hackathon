@@ -56,6 +56,9 @@ jobs:
             -e AWS_S3_BUCKET="${{ secrets.AWS_S3_BUCKET }}" \
             -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             -e GEMINI_API_URL="${{ secrets.GEMINI_API_URL }}" \
+            -e AWS_BEDROCK_AGENT_ARN="${{ secrets.AWS_BEDROCK_AGENT_ARN }}" \
+            -e AWS_BEDROCK_AGENT_ID="${{ secrets.AWS_BEDROCK_AGENT_ID }}" \
+            -e AWS_BEDROCK_SESSION_ID="${{ secrets.AWS_BEDROCK_SESSION_ID }}" \
             gnaneswaryalla/clofast-server:latest
       - name: Run Client Container
         run: |
