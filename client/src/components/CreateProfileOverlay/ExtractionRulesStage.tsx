@@ -144,7 +144,7 @@ const ExtractionRulesStage: React.FC<{
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Rule Name *
+                Rule Name <span className="text-danger text-lg">*</span>
               </label>
               <input
                 type="text"
@@ -179,9 +179,13 @@ const ExtractionRulesStage: React.FC<{
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
-                Terms *
+              <label className="block text-sm font-medium text-text-primary">
+                Terms <span className="text-danger text-lg">*</span>
               </label>
+              <p className="text-xs text-text-secondary mb-2">
+                You can add multiple terms by separating them with commas (,)
+              </p>
+
               <div className="flex gap-2">
                 <input
                   type="text"
