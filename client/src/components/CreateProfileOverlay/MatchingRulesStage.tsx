@@ -2,6 +2,9 @@ import { useProfileCreation } from "../../context/ProfileCreationContext";
 import { useState } from "react";
 import { type MatchingRule } from "../../types/profileTypes";
 import { ChevronRight, Trash } from "lucide-react";
+import { CustomDropdown } from "../CustomDropdown";
+import { type DropdownOption } from "../CustomDropdown";
+
 const MatchingRulesStage: React.FC<{
   onFinish: (rules: MatchingRule[]) => void;
   onBack: () => void;
@@ -15,6 +18,9 @@ const MatchingRulesStage: React.FC<{
     documentPairs: [],
     rules: [],
   });
+  const createDropdownOptions = (items: string[]): DropdownOption[] => {
+    return items.map((item) => ({ value: item, label: item }));
+  };
 
   const availableTerms = data.extractionRules.flatMap((rule) => rule.terms);
 
@@ -108,7 +114,7 @@ const MatchingRulesStage: React.FC<{
 
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
-              Rule Name *
+              Rule Name <span className="text-danger text-lg">*</span>
             </label>
             <input
               type="text"
@@ -145,7 +151,7 @@ const MatchingRulesStage: React.FC<{
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="text-sm font-medium text-text-primary">
-                Term Pairs *
+                Term Pairs <span className="text-danger text-lg">*</span>
               </label>
               <button
                 onClick={handleAddTermPair}
@@ -157,38 +163,28 @@ const MatchingRulesStage: React.FC<{
             <div className="space-y-3">
               {(currentRule.rules || []).map((pair, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <select
+                  <CustomDropdown
                     value={pair.term1}
-                    onChange={(e) =>
-                      handleUpdateTermPair(idx, "term1", e.target.value)
+                    onChange={(value) =>
+                      handleUpdateTermPair(idx, "term1", value)
                     }
-                    className="flex-1 px-3 py-2 bg-bg border border-border rounded-lg text-text-primary text-sm"
-                  >
-                    <option value="">Select term 1</option>
-                    {availableTerms.map((term, i) => (
-                      <option key={i} value={term}>
-                        {term}
-                      </option>
-                    ))}
-                  </select>
+                    options={createDropdownOptions(availableTerms)}
+                    placeholder="Select term 1"
+                    className="flex-1"
+                  />
                   <ChevronRight className="w-4 h-4 text-text-tertiary" />
-                  <select
+                  <CustomDropdown
                     value={pair.term2}
-                    onChange={(e) =>
-                      handleUpdateTermPair(idx, "term2", e.target.value)
+                    onChange={(value) =>
+                      handleUpdateTermPair(idx, "term2", value)
                     }
-                    className="flex-1 px-3 py-2 bg-bg border border-border rounded-lg text-text-primary text-sm"
-                  >
-                    <option value="">Select term 2</option>
-                    {availableTerms.map((term, i) => (
-                      <option key={i} value={term}>
-                        {term}
-                      </option>
-                    ))}
-                  </select>
+                    options={createDropdownOptions(availableTerms)}
+                    placeholder="Select term 2"
+                    className="flex-1"
+                  />
                   <button
                     onClick={() => handleRemoveTermPair(idx)}
-                    className="p-2 text-danger hover:bg-danger hover:bg-opacity-10 rounded-lg"
+                    className="p-2 text-danger hover:text-danger/70 rounded-lg"
                   >
                     <Trash className="w-4 h-4" />
                   </button>

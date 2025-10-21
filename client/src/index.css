@@ -35,7 +35,11 @@ button {
   --color-primary: #1a7bff;
   --color-bg-special-blue: #3071f2;
   --color-bg-special-green: #b7fc9a;
-
+  --color-progress-green: #57e4a1;
+  --color-danger: #ff5b5b;
+  --color-warning: #efbf45;
+  --color-success: #33ae74;
+  --color-info: #7ab2ff;
   /* Dark mode */
   /* --color-d-bg-navbar: #ffffff;
   --color-d-bg-light: #1e1e1e;
@@ -53,11 +57,6 @@ button {
   --color-d-bg-special-green: #5adf72; */
 
   /* Status colors (same across themes) */
-  --color-progress-green: #57e4a1;
-  --color-danger: #ff5b5b;
-  --color-warning: #efbf45;
-  --color-success: #33ae74;
-  --color-info: #7ab2ff;
 }
 
 body {

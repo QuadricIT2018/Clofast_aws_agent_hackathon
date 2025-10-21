@@ -104,7 +104,7 @@ const UploadDocumentsStage: React.FC<{
               </div>
               <button
                 onClick={() => handleDelete(doc._id)}
-                className="p-2 text-danger hover:bg-danger hover:bg-opacity-10 rounded-lg transition-colors"
+                className="p-2 text-danger hover:text-danger/70 rounded-lg transition-colors"
               >
                 <Trash className="w-4 h-4" />
               </button>
