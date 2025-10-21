@@ -1,4 +1,4 @@
-# 🧠 CloFast — AI-Powered Reconciliation System
+# 🧠 CloFast — AI-Powered POS Reconciliation System
 
 ### 🚀 Built for AWS Agent Hackathon 2025
 

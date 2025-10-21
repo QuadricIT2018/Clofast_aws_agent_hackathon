@@ -11,8 +11,7 @@ import matchingRules from "./routes/matchingRulesRoutes.js";
 
 dotenv.config();
 
-const MONGODB_URI =
-  process.env.MONGODB_URL || "mongodb://localhost:27017/hackathonDB";
+const MONGODB_URI = process.env.MONGODB_URI || "";
 const PORT = process.env.PORT || 5550;
 
 const app = express();
@@ -30,7 +29,6 @@ app.use("/api/extraction", extractionRoutes);
 app.use("/api/matching-rules", matchingRules);
 
 // ----------------- MongoDB Connection -----------------
-console.log(MONGODB_URI);
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
