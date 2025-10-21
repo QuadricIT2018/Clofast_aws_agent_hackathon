@@ -45,7 +45,9 @@ const ProfileDetailsPage = () => {
   }, [id]);
 
   const handleRunReconciliation = () => {
-    console.log("Run reconciliation for profile:", profile?._id);
+    console.log("🚀 Starting AI-powered reconciliation for profile:", profile?._id);
+    console.log("📊 Selected documents:", selectedDocuments.length);
+    console.log("📋 Selected matching rules:", selectedMatchingRules.length);
     setActiveTab("reconcileScreen");
   };
 

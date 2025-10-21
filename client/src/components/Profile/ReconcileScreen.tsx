@@ -73,20 +73,21 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
   const performReconciliation = useCallback(async () => {
     try {
       setIsReconciling(true);
+      console.log("🤖 Starting AI-powered reconciliation...");
 
       const documentIds = selectedDocuments.map((doc) => doc._id);
       const matchingRuleIds = selectedMatchingRules.map((rule) => rule._id);
 
-      const results = await reconcileDocuments(documentIds, matchingRuleIds);
+      const results = await reconcileDocuments(documentIds, matchingRuleIds, profile._id);
 
       setReconciliationResults(results);
-      console.log(results);
+      console.log("✅ AI reconciliation completed successfully");
     } catch (err) {
-      console.error("Reconciliation failed:", err);
+      console.error("❌ AI reconciliation failed:", err);
     } finally {
       setIsReconciling(false);
     }
-  }, [selectedDocuments, selectedMatchingRules]);
+  }, [selectedDocuments, selectedMatchingRules, profile._id]);
 
   // Run reconciliation when component mounts or data changes
   useEffect(() => {
@@ -215,6 +216,39 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
         </div>
       </div>
 
+      {/* AI Summary Banner */}
+      {reconciliationResults.length > 0 && (
+        <div className="bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20 rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <span className="text-2xl">🤖</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-text-primary dark:text-d-text-primary mb-1">
+                AI Reconciliation Complete
+              </h3>
+              <p className="text-sm text-text-secondary dark:text-d-text-secondary">
+                Processed {reconciliationResults.length} transactions using AgentCore runtime with {
+                  reconciliationResults.filter(r => r.confidence && r.confidence >= 90).length
+                } high-confidence matches and {
+                  reconciliationResults.filter(r => r.confidence && r.confidence >= 80 && r.confidence < 90).length
+                } moderate-confidence matches.
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-primary dark:text-d-primary">
+                {reconciliationResults.length > 0 
+                  ? ((reconciliationResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / reconciliationResults.length)).toFixed(1)
+                  : 0}%
+              </div>
+              <div className="text-xs text-text-tertiary dark:text-d-text-tertiary">
+                Avg Confidence
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-bg-light dark:bg-d-bg-light border border-border dark:border-d-border rounded-xl p-4">
@@ -256,13 +290,23 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* AI Processing State */}
       {isReconciling && (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-d-primary"></div>
-          <p className="ml-3 text-text-secondary dark:text-d-text-secondary">
-            Reconciling transactions...
-          </p>
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-d-primary"></div>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🤖</span>
+              <p className="text-text-secondary dark:text-d-text-secondary font-medium">
+                AI Agent is analyzing transactions...
+              </p>
+            </div>
+          </div>
+          <div className="text-center max-w-md">
+            <p className="text-sm text-text-tertiary dark:text-d-text-tertiary">
+              Using AgentCore runtime with advanced pattern recognition and semantic matching
+            </p>
+          </div>
         </div>
       )}
 
@@ -276,14 +320,14 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 {selectedDocuments[0]?.documentName || "Document 1"}
               </h3>
             </div>
-            <div className="overflow-x-auto overflow-y-auto max-h-[600px] w-full">
-              <table className="min-w-[800px] border-collapse">
+            <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+              <table className="w-full border-collapse">
                 <thead className="sticky top-0 bg-bg dark:bg-d-bg">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border">
                       Status
                     </th>
-                    {leftHeaders.map((header, idx) => (
+                    {leftHeaders.slice(0, 4).map((header, idx) => (
                       <th
                         key={idx}
                         className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -315,13 +359,24 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                         }`}
                       >
                         <td className="px-4 py-3 border-b border-border dark:border-d-border">
-                          {result.isReconciled ? (
-                            <CheckCircle className="w-4 h-4 text-success" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-danger" />
-                          )}
+                          <div className="flex items-center gap-2">
+                            {result.isReconciled ? (
+                              <CheckCircle className="w-4 h-4 text-success" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-danger" />
+                            )}
+                            {result.confidence !== undefined && (
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                result.confidence >= 90 ? 'bg-success/10 text-success' :
+                                result.confidence >= 80 ? 'bg-warning/10 text-warning' :
+                                'bg-danger/10 text-danger'
+                              }`}>
+                                {result.confidence.toFixed(0)}%
+                              </span>
+                            )}
+                          </div>
                         </td>
-                        {leftHeaders.map((header, cellIdx) => (
+                        {leftHeaders.slice(0, 4).map((header, cellIdx) => (
                           <td
                             key={cellIdx}
                             className="px-4 py-3 text-sm text-text-secondary dark:text-d-text-secondary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -347,14 +402,14 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 {selectedDocuments[1]?.documentName || "Document 2"}
               </h3>
             </div>
-            <div className="overflow-x-auto overflow-y-auto max-h-[600px] w-full">
-              <table className="min-w-[800px] border-collapse">
+            <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+              <table className="w-full border-collapse">
                 <thead className="sticky top-0 bg-bg dark:bg-d-bg">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border">
                       Status
                     </th>
-                    {rightHeaders.map((header, idx) => (
+                    {rightHeaders.slice(0, 4).map((header, idx) => (
                       <th
                         key={idx}
                         className="px-4 py-3 text-left text-xs font-semibold text-text-primary dark:text-d-text-primary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -386,13 +441,24 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                         }`}
                       >
                         <td className="px-4 py-3 border-b border-border dark:border-d-border">
-                          {result.isReconciled ? (
-                            <CheckCircle className="w-4 h-4 text-success" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-danger" />
-                          )}
+                          <div className="flex items-center gap-2">
+                            {result.isReconciled ? (
+                              <CheckCircle className="w-4 h-4 text-success" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-danger" />
+                            )}
+                            {result.confidence !== undefined && (
+                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                result.confidence >= 90 ? 'bg-success/10 text-success' :
+                                result.confidence >= 80 ? 'bg-warning/10 text-warning' :
+                                'bg-danger/10 text-danger'
+                              }`}>
+                                {result.confidence.toFixed(0)}%
+                              </span>
+                            )}
+                          </div>
                         </td>
-                        {rightHeaders.map((header, cellIdx) => (
+                        {rightHeaders.slice(0, 4).map((header, cellIdx) => (
                           <td
                             key={cellIdx}
                             className="px-4 py-3 text-sm text-text-secondary dark:text-d-text-secondary border-b border-border dark:border-d-border whitespace-nowrap"
@@ -484,6 +550,7 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.entries(selectedUnreconciled.leftTransaction || {})
                     .filter(([key]) => key !== "id")
+                    .slice(0, 6)
                     .map(([key, value], idx) => (
                       <div
                         key={idx}
@@ -584,24 +651,27 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-text-primary dark:text-d-text-primary mb-2">
-                          Why This Transaction Failed to Match
+                          AI Analysis: Why This Transaction Failed to Match
                         </h4>
-                        <p className="text-sm text-text-secondary dark:text-d-text-secondary leading-relaxed">
-                          This transaction didn't match due to missing or
-                          mismatched field values such as{" "}
-                          <strong className="text-text-primary dark:text-d-text-primary">
-                            amount
-                          </strong>
-                          ,{" "}
-                          <strong className="text-text-primary dark:text-d-text-primary">
-                            date
-                          </strong>
-                          , or{" "}
-                          <strong className="text-text-primary dark:text-d-text-primary">
-                            reference ID
-                          </strong>
-                          .
+                        <p className="text-sm text-text-secondary dark:text-d-text-secondary leading-relaxed mb-3">
+                          {selectedUnreconciled.aiReasoning || 
+                            "This transaction didn't match due to missing or mismatched field values such as amount, date, or reference ID."
+                          }
                         </p>
+                        {selectedUnreconciled.confidence !== undefined && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-xs font-medium text-text-tertiary dark:text-d-text-tertiary">
+                              AI Confidence:
+                            </span>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                              selectedUnreconciled.confidence >= 90 ? 'bg-success/10 text-success' :
+                              selectedUnreconciled.confidence >= 80 ? 'bg-warning/10 text-warning' :
+                              'bg-danger/10 text-danger'
+                            }`}>
+                              {selectedUnreconciled.confidence.toFixed(1)}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -635,6 +705,23 @@ const ReconcileScreen = ({ profile }: ReconcileScreenProps) => {
                       </div>
                     </div>
                   </div>
+
+                  {selectedUnreconciled.discrepancies && selectedUnreconciled.discrepancies.length > 0 && (
+                    <div className="bg-warning/5 border border-warning/20 rounded-xl p-5">
+                      <h4 className="font-semibold text-text-primary dark:text-d-text-primary mb-3 flex items-center gap-2">
+                        <span className="text-2xl">🤖</span>
+                        AI-Detected Discrepancies
+                      </h4>
+                      <ul className="space-y-2">
+                        {selectedUnreconciled.discrepancies.map((discrepancy, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm text-text-secondary dark:text-d-text-secondary">
+                            <span className="text-warning mt-0.5">•</span>
+                            <span>{discrepancy}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <div className="bg-info/5 border border-info/20 rounded-xl p-5">
                     <h4 className="font-semibold text-text-primary dark:text-d-text-primary mb-3">

@@ -11,7 +11,7 @@ import matchingRules from "./routes/matchingRulesRoutes.js";
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
+const MONGODB_URI = process.env.MONGODB_URL || "";
 const PORT = process.env.PORT || 5550;
 
 const app = express();

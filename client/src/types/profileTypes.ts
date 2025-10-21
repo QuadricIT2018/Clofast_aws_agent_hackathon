@@ -70,4 +70,27 @@ export interface ReconciliationResult {
   rightTransaction: Transaction | null;
   isReconciled: boolean;
   matchedFields?: string[];
+  confidence?: number;
+  aiReasoning?: string;
+  discrepancies?: string[];
+}
+
+export interface ReconciliationSummary {
+  totalTransactions: number;
+  reconciledCount: number;
+  unreconciledCount: number;
+  confidenceScore: number;
+}
+
+export interface ReconciliationResponse {
+  success: boolean;
+  message: string;
+  data: ReconciliationResult[];
+  aiSummary?: ReconciliationSummary;
+  metadata?: {
+    processedBy: string;
+    timestamp: string;
+    documentsProcessed: string[];
+    rulesApplied: number;
+  };
 }

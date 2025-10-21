@@ -2,12 +2,10 @@
 import axios, { AxiosError } from "axios";
 import type { ApiError } from "../types/authTypes";
 
-const API_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5550/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5550/api";
 
 export const extractDocumentData = async (documentId: string) => {
   try {
-    console.log(documentId);
     const response = await axios.post(`${API_URL}/extraction/extract`, {
       documentId,
     });
