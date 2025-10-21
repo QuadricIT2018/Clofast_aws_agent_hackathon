@@ -7,7 +7,7 @@ import {
 } from "../types/profileTypes";
 import { type ReconciliationResult } from "../types/profileTypes";
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5550";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5550/api";
 
 export const fetchProfiles = async (): Promise<Profile[]> => {
   const response = await axios.get(`${API_BASE_URL}/profiles`);
@@ -59,20 +59,22 @@ export const createProfile = async (
   }
 };
 
-// Perform reconciliation using backend API
+// Perform reconciliation using backend API with AI
 export const reconcileDocuments = async (
   documentIds: string[],
-  matchingRuleIds: string[]
+  matchingRuleIds: string[],
+  profileId?: string
 ): Promise<ReconciliationResult[]> => {
   try {
     const response = await axios.post(`${API_BASE_URL}/profiles/reconcile`, {
       documentIds,
       matchingRuleIds,
+      profileId,
     });
 
     return response.data.data as ReconciliationResult[];
   } catch (error) {
-    console.error("Error performing reconciliation:", error);
+    console.error("Error performing AI reconciliation:", error);
     throw error;
   }
 };

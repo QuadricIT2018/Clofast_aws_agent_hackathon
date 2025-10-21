@@ -87,7 +87,7 @@ const Dashboard: React.FC = () => {
           Clofast Dashboard
         </h1>
         <p className="text-text-tertiary opacity-80">
-          AI-Powered Reconciliation System
+          AI-Powered POS Reconciliation System
         </p>
       </div>
 
