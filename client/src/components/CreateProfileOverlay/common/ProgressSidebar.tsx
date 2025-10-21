@@ -12,8 +12,8 @@ const ProgressSidebar: React.FC<{
   ];
 
   return (
-    <div className="w-full h-full bg-bg-light border-r border-border p-6">
-      <h3 className="text-lg font-bold text-text-primary mb-6">
+    <div className="w-full h-full bg-bg-light border-r border-border p-6 overflow-y-auto">
+      <h3 className="text-lg font-bold text-text-primary mb-2">
         Creation Journey
       </h3>
       <div className="flex flex-col items-center py-2">
@@ -73,9 +73,9 @@ const ProgressSidebar: React.FC<{
                 </span>
               </button>
               {!isLast && (
-                <div className="flex flex-col items-center my-4">
+                <div className="flex flex-col items-center my-2">
                   <div
-                    className={`w-0.5 h-12 ${
+                    className={`w-0.5 h-4 ${
                       isCompleted ? "bg-success" : "bg-border"
                     }`}
                   />

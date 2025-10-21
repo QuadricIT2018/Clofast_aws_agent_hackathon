@@ -55,20 +55,21 @@ const DataSources = ({
   );
 
   useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        if (!profile?._id) return;
-        const docs = await getDocumentsByProfile(profile._id);
-        setDocuments(docs);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDocuments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
+
+  const fetchDocuments = async () => {
+    try {
+      if (!profile?._id) return;
+      const docs = await getDocumentsByProfile(profile._id);
+      setDocuments(docs);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Notify parent component when exactly 2 data sources are selected
@@ -120,6 +121,9 @@ const DataSources = ({
       const result = await extractDocumentData(doc._id);
       showSuccessToast("Document data extracted and saved successfully!");
       console.log("Extraction complete:", result);
+
+      // ✅ Re-fetch documents to update the UI
+      await fetchDocuments();
     } catch (error) {
       showErrorToast(
         "Failed to extract data from the document. Please try again."
