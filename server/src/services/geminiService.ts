@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import axios from "axios";
-import path from "path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
@@ -37,24 +36,32 @@ export const extractDataFromDocument = async (
 
     // 2️⃣ Prepare prompt
     const prompt = `
-You are a data extraction assistant. Extract all rows of structured data from the document.
+      You are an intelligent data extraction assistant designed to extract structured tabular data from semi-structured business documents such as payout reports or invoices.
 
-For each record, extract the following fields:
-${terms.map((term, idx) => `${idx + 1}. ${term}`).join("\n")}
+      Your task:
+      Extract **all rows (records)** of structured data from the provided document.
 
-Instructions:
-- There may be multiple entries or transactions in the document.
-- Return ALL entries as an array of JSON objects.
-- Each object must contain the exact keys provided above.
-- If a value is missing, set it to null.
-- Do not include any extra text or explanation.
+      Fields to extract for each record:
+      ${terms.map((term, idx) => `${idx + 1}. ${term}`).join("\n")}
 
-Return ONLY a valid JSON array:
-[
-  { "Store ID": "...", "Store Name": "...", ... },
-  { "Store ID": "...", "Store Name": "...", ... }
-]
-`.trim();
+      Important Instructions:
+      1. The document may contain **multiple entries or transactions**. Extract *all* of them.
+      2. Column headers in the document may not be perfectly aligned vertically — use contextual and semantic understanding to correctly map values to their corresponding fields.
+      3. Maintain **the exact field names** as listed above — no renaming, no additional fields.
+      4. Handle missing or inconsistent data as follows:
+        - If a field represents a **categorical/text value** (e.g., IDs, Names, Dates, Status), and the value is missing, set it to **null**.
+        - If a field represents a **numerical value** (e.g., amounts, totals, fees, charges, percentages), and the value is missing or appears as an empty cell, invalid number, or "—", set it to **0**.
+      5. Ensure all numeric values are parsed as valid numbers (no currency symbols, commas, or text — only numeric form).
+      6. Dates should be kept as they appear (do not reformat them).
+      7. Return **only** a clean, valid JSON array — no explanations, comments, or Markdown.
+      8. The final output must strictly be:
+      [
+        { "Store ID": "...", "Store Name": "...", ... },
+        { "Store ID": "...", "Store Name": "...", ... }
+      ]
+
+      Be extremely careful with alignment, field matching, and consistent key naming.
+      `.trim();
 
     // 3️⃣ Use the Gemini SDK instead of REST call
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
