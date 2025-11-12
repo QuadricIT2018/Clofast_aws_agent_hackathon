@@ -27,6 +27,7 @@ interface DocumentColumns {
   columns: string[];
 }
 
+//extraction rule stage
 const ExtractionRulesStage: React.FC<{
   onNext: () => void;
   onBack: () => void;
