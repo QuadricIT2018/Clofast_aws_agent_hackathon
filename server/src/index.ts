@@ -11,7 +11,9 @@ import matchingRules from "./routes/matchingRulesRoutes.js";
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || "MONGODB_URL=mongodb+srv://gnani4412_db_user:gnani12345@cluster0.btl84ws.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URL =
+  process.env.MONGODB_URL ||
+  "MONGODB_URL=mongodb+srv://gnani4412_db_user:gnani12345@cluster0.btl84ws.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const PORT = process.env.PORT || 5550;
 
 const app = express();
@@ -30,7 +32,7 @@ app.use("/api/matching-rules", matchingRules);
 
 // ----------------- MongoDB Connection -----------------
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URL)
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
     app.listen(PORT, () => {
