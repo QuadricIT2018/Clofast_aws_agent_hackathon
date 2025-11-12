@@ -1,0 +1,10 @@
+bedrock-agentcore
+strands-agents
+boto3
+PyPDF2
+requests
+pandas
+openpyxl
+xlrd
+numpy
+python-dateutil

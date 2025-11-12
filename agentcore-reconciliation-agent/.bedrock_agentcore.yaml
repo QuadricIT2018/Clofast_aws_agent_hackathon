@@ -1,0 +1,41 @@
+default_agent: clofast_reconciliation_agent
+agents:
+  clofast_reconciliation_agent:
+    name: clofast_reconciliation_agent
+    entrypoint: C:/QuadricIT/Clofast_aws_agent_hackathon/agentcore-reconciliation-agent/agent.py
+    platform: linux/arm64
+    container_runtime: none
+    source_path: null
+    aws:
+      execution_role: arn:aws:iam::222634382147:role/AmazonBedrockAgentCoreSDKRuntime-us-west-2-17c1b85161
+      execution_role_auto_create: false
+      account: '222634382147'
+      region: us-west-2
+      ecr_repository: 222634382147.dkr.ecr.us-west-2.amazonaws.com/bedrock-agentcore-clofast_reconciliation_agent
+      ecr_auto_create: false
+      network_configuration:
+        network_mode: PUBLIC
+        network_mode_config: null
+      protocol_configuration:
+        server_protocol: HTTP
+      observability:
+        enabled: true
+    bedrock_agentcore:
+      agent_id: clofast_reconciliation_agent-EzNFV79Nh0
+      agent_arn: arn:aws:bedrock-agentcore:us-west-2:222634382147:runtime/clofast_reconciliation_agent-EzNFV79Nh0
+      agent_session_id: 1f5f0d91-8c62-43bd-8d7e-0a326085c5a4
+    codebuild:
+      project_name: bedrock-agentcore-clofast_reconciliation_agent-builder
+      execution_role: arn:aws:iam::222634382147:role/AmazonBedrockAgentCoreSDKCodeBuild-us-west-2-17c1b85161
+      source_bucket: bedrock-agentcore-codebuild-sources-222634382147-us-west-2
+    memory:
+      mode: STM_ONLY
+      memory_id: clofast_reconciliation_agent_mem-tNnkrkEp4n
+      memory_arn: arn:aws:bedrock-agentcore:us-west-2:222634382147:memory/clofast_reconciliation_agent_mem-tNnkrkEp4n
+      memory_name: clofast_reconciliation_agent_mem
+      event_expiry_days: 30
+      first_invoke_memory_check_done: true
+      was_created_by_toolkit: false
+    authorizer_configuration: null
+    request_header_configuration: null
+    oauth_configuration: null

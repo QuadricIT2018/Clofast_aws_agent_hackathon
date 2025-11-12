@@ -1,0 +1,78 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo Creating ECR repository if it doesn't exist...
+      - aws ecr create-repository --repository-name clofast-reconciliation-agent --region $AWS_DEFAULT_REGION || true
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker push $IMAGE_REPO_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Deploying to AWS Bedrock AgentCore...
+      - |
+        python3 << 'EOF'
+        import boto3
+        import json
+        import os
+        
+        client = boto3.client('bedrock-agentcore-control', region_name=os.environ['AWS_DEFAULT_REGION'])
+        
+        try:
+            response = client.create_agent_runtime(
+                agentRuntimeName='clofastReconciliationAgent',
+                agentRuntimeArtifact={
+                    'containerConfiguration': {
+                        'containerUri': os.environ['IMAGE_REPO_NAME'] + ':' + os.environ['IMAGE_TAG']
+                    }
+                },
+                networkConfiguration={"networkMode": "PUBLIC"},
+                roleArn='arn:aws:iam::222634382147:role/CloFastAgentCoreRole',
+                description='CloFast Financial Reconciliation Agent powered by AWS Bedrock AgentCore'
+            )
+            print(f"SUCCESS: Agent Runtime created: {response['agentRuntimeArn']}")
+            print(f"Runtime URL: {response.get('agentRuntimeUrl', 'Not available yet')}")
+            
+            # Save runtime info to file for later retrieval
+            with open('/tmp/agent-info.json', 'w') as f:
+                json.dump(response, f)
+                
+        except Exception as e:
+            if 'already exists' in str(e):
+                print("Agent runtime already exists, updating...")
+                try:
+                    response = client.update_agent_runtime(
+                        agentRuntimeName='clofastReconciliationAgent',
+                        agentRuntimeArtifact={
+                            'containerConfiguration': {
+                                'containerUri': os.environ['IMAGE_REPO_NAME'] + ':' + os.environ['IMAGE_TAG']
+                            }
+                        }
+                    )
+                    print(f"SUCCESS: Agent Runtime updated: {response['agentRuntimeArn']}")
+                except Exception as update_error:
+                    print(f"ERROR: Failed to update agent runtime: {str(update_error)}")
+                    raise
+            else:
+                print(f"ERROR: Failed to create agent runtime: {str(e)}")
+                raise
+        EOF
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-west-2
+    AWS_ACCOUNT_ID: 222634382147
+    IMAGE_REPO_NAME: 222634382147.dkr.ecr.us-west-2.amazonaws.com/clofast-reconciliation-agent
+    IMAGE_TAG: latest
+
+artifacts:
+  files:
+    - /tmp/agent-info.json
+  name: agent-deployment-info
