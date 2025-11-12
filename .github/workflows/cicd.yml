@@ -37,14 +37,23 @@ jobs:
     needs: [build-client, build-server]
     runs-on: self-hosted
     steps:
+      - name: Clean up Docker resources
+        run: |
+          docker system prune -af --volumes
+          docker builder prune -af
+
       - name: Pull Client Image
         run: docker pull gnaneswaryalla/clofast-client:latest
+
       - name: Pull Server Image
         run: docker pull gnaneswaryalla/clofast-server:latest
+
       - name: Delete old Server Container
         run: docker rm -f clofast-server || true
+
       - name: Delete old Client Container
         run: docker rm -f clofast-client || true
+
       - name: Run Server Container
         run: |
           docker run -d --restart unless-stopped -p 5550:5550 --name clofast-server \
@@ -60,6 +69,7 @@ jobs:
             -e AWS_BEDROCK_AGENT_ID="${{ secrets.AWS_BEDROCK_AGENT_ID }}" \
             -e AWS_BEDROCK_SESSION_ID="${{ secrets.AWS_BEDROCK_SESSION_ID }}" \
             gnaneswaryalla/clofast-server:latest
+
       - name: Run Client Container
         run: |
           docker run -d --restart unless-stopped -p 5173:80 --name clofast-client \
